@@ -8,7 +8,6 @@ Feature: Video Search Management
   Background:
     Given those users already exist: user1
 
-
   Scenario: Search video by tag
     When user1 submit Youtube videos:
       | id     | name                      | description                        | tags                 | url                                         |
@@ -27,6 +26,3 @@ Feature: Video Search Management
       | video3 | every-breath-you-take.mp4 | The Police - Every breath you take | police,pop,eighties  | https://www.youtube.com/watch?v=OMOGaugKpzs |
       | video4 | yesterday.mp4             | The Beattles - Yesterday           | pop,beattles,top     | https://www.youtube.com/watch?v=Ho2e0zvGEWE |
     Then I should be suggested tags police,pop for the word po
-
-
-

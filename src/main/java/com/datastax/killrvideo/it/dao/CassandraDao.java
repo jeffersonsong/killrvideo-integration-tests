@@ -15,9 +15,10 @@ public class CassandraDao {
 
     private static Logger LOGGER = LoggerFactory.getLogger(CassandraDao.class);
 
-
     public final Session session;
+    
     public final PreparedStatement findUserByEmailPs;
+    
     public final PreparedStatement findVideoByIdPs;
 
     @Inject
@@ -25,7 +26,7 @@ public class CassandraDao {
         this.session = session;
         maybeCreateSchema(session);
         this.findUserByEmailPs = session.prepare("SELECT * FROM killrvideo.user_credentials WHERE email = ?");
-        this.findVideoByIdPs = session.prepare("SELECT added_date FROM killrvideo.videos WHERE videoid = ?");
+        this.findVideoByIdPs   = session.prepare("SELECT added_date FROM killrvideo.videos WHERE videoid = ?");
     }
 
     public Row getOne(BoundStatement bs) {

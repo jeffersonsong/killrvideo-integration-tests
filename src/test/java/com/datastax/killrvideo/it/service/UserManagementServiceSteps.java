@@ -4,10 +4,14 @@ import static com.datastax.killrvideo.it.configuration.KillrVideoITConfiguration
 import static com.datastax.killrvideo.it.util.TypeConverter.uuidToUuid;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -25,20 +29,25 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import killrvideo.user_management.UserManagementServiceGrpc;
 import killrvideo.user_management.UserManagementServiceGrpc.UserManagementServiceBlockingStub;
-import killrvideo.user_management.UserManagementServiceOuterClass.*;
+import killrvideo.user_management.UserManagementServiceOuterClass.CreateUserRequest;
+import killrvideo.user_management.UserManagementServiceOuterClass.CreateUserResponse;
+import killrvideo.user_management.UserManagementServiceOuterClass.GetUserProfileRequest;
+import killrvideo.user_management.UserManagementServiceOuterClass.GetUserProfileResponse;
+import killrvideo.user_management.UserManagementServiceOuterClass.UserProfile;
+import killrvideo.user_management.UserManagementServiceOuterClass.VerifyCredentialsRequest;
+import killrvideo.user_management.UserManagementServiceOuterClass.VerifyCredentialsResponse;
 
 public class UserManagementServiceSteps extends AbstractSteps {
 
     private static Logger LOGGER = LoggerFactory.getLogger(UserManagementServiceSteps.class);
+    
     private static AtomicReference<Boolean> SHOULD_CHECK_SERVICE= new AtomicReference<>(true);
-
-    @Override
-    protected String serviceName() {
-        return USER_SERVICE_NAME;
-    }
-
+    
     private static final Map<String, UserProfile> PROFILES = new HashMap<>();
+    
     private static final Map<String, String> ERRORS = new ConcurrentHashMap<>();
+    
+    @SuppressWarnings("serial")
     public static Map<String, UUID> USERS = new HashMap<String, UUID>() {
         {
             put("user1", UUID.randomUUID());
@@ -50,7 +59,11 @@ public class UserManagementServiceSteps extends AbstractSteps {
 
     private UserManagementServiceBlockingStub userStub;
 
-
+    @Override
+    protected String serviceName() {
+        return USER_SERVICE_NAME;
+    }
+    
     @Before("@user_scenarios")
     public void init() {
         Optional.of(SHOULD_CHECK_SERVICE).map(AtomicReference::get).ifPresent(x -> {
@@ -104,7 +117,7 @@ public class UserManagementServiceSteps extends AbstractSteps {
 
     @When("I create (\\d) users with email (.+) and password (.+)")
     public void createUserWithEmail(int userCount, String email, String password) throws Exception {
-        List<CreateUserRequest> requests = new ArrayList();
+        List<CreateUserRequest> requests = new ArrayList<>();
 
         for (int i=1; i<= userCount; i++) {
             requests.add(CreateUserRequest.newBuilder()

@@ -11,5 +11,4 @@ import cucumber.api.junit.Cucumber;
         plugin = {"progress", "html:/tmp/cucumber-report"},
         features = "src/test/resources")
 public class ServicesTest {
-
 }

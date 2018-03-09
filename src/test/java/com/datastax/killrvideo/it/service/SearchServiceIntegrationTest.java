@@ -2,18 +2,23 @@ package com.datastax.killrvideo.it.service;
 
 import static com.datastax.killrvideo.it.configuration.KillrVideoITConfiguration.SEARCH_SERVICE_NAME;
 import static com.datastax.killrvideo.it.service.VideoCatalogServiceSteps.VIDEOS;
-import static com.datastax.killrvideo.it.service.VideoCatalogServiceSteps.VIDEOS_BY_ID;
 import static com.datastax.killrvideo.it.service.VideoCatalogServiceSteps.cleanUpUserAndVideoTables;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.evanlennick.retry4j.CallExecutor;
+import com.evanlennick.retry4j.config.RetryConfig;
+import com.evanlennick.retry4j.config.RetryConfigBuilder;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -26,17 +31,26 @@ import killrvideo.search.SearchServiceOuterClass.SearchResultsVideoPreview;
 import killrvideo.search.SearchServiceOuterClass.SearchVideosRequest;
 import killrvideo.search.SearchServiceOuterClass.SearchVideosResponse;
 
-public class SearchServiceSteps extends AbstractSteps {
+/**
+ * Allow to test Search Services.
+ * <ol>
+ *  <li>
+ * @author DataStax evangelist team.
+ */
+public class SearchServiceIntegrationTest extends AbstractSteps {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(SearchServiceSteps.class);
-    private static AtomicReference<Boolean> SHOULD_CHECK_SERVICE= new AtomicReference<>(true);
+    /** Logger for Test.*/
+    private static Logger LOGGER = LoggerFactory.getLogger(SearchServiceIntegrationTest.class);
+    
+    /** Boolean to keep track of testing services. */
+    private static AtomicReference<Boolean> SHOULD_CHECK_SERVICE = new AtomicReference<>(true);
 
-    @Override
-    protected String serviceName() {
-        return SEARCH_SERVICE_NAME;
-    }
-
+    /** Client to Search service. */
     private SearchServiceBlockingStub searchStub;
+    
+    /** {@inheritDoc} */
+    @Override
+    protected String serviceName() { return SEARCH_SERVICE_NAME; }
 
     @Before("@search_scenarios")
     public void init() {
@@ -44,7 +58,6 @@ public class SearchServiceSteps extends AbstractSteps {
             checkForService();
             SHOULD_CHECK_SERVICE.getAndSet(null);
         });
-
         searchStub = SearchServiceGrpc.newBlockingStub(managedChannel);
         LOGGER.info("Truncating users & videos BEFORE executing tests");
         cleanUpUserAndVideoTables(dao);
@@ -58,45 +71,51 @@ public class SearchServiceSteps extends AbstractSteps {
 
     @Then("searching videos with tag (.+) gives: (.*)")
     public void searchVideosByTag(String tag, List<String> expectedVideos) {
-
+        // Checking parameters
         final int expectedVideoCount = expectedVideos.size();
-
         assertThat(VIDEOS)
                 .as("%s is unknown, please specify videoXXX where XXX is a digit")
                 .containsKeys(expectedVideos.toArray(new String[expectedVideoCount]));
-
         assertThat(tag)
                 .as("A non-empty tag should be provided for video searching")
                 .isNotEmpty();
-
+        
         SearchVideosRequest request = SearchVideosRequest
                 .newBuilder()
                 .setQuery(tag)
-                .setPageSize(100)
+                .setPageSize(100).build();
+
+        /**
+         * Search is performed using solr INDEX. As such, a delay is required for indexing.
+         * Maximum delay of 10s is OK but here we try 10 times, once per second
+         */
+        Callable<Integer> searchTags = () -> {
+            System.out.println("[Waiting for solr to index tags]");
+            return searchStub.searchVideos(request).getVideosList().size();
+        };
+        RetryConfig config = new RetryConfigBuilder()
+                .retryOnReturnValue(new Integer(0))
+                .failOnAnyException()
+                .withMaxNumberOfTries(10)
+                .withDelayBetweenTries(2, ChronoUnit.SECONDS)
+                .withFixedBackoff()
                 .build();
+        new CallExecutor<Integer>(config).execute(searchTags);
 
         final SearchVideosResponse response = searchStub.searchVideos(request);
-
-        assertThat(response)
-                .as("Find 0 video with tag %s", tag)
-                .isNotNull();
-
-/*
+        
+        assertThat(response).as("Find 0 video with tag %s", tag).isNotNull();
         assertThat(response.getVideosList())
                 .as("There should be %s videos having tag %s", expectedVideoCount, tag)
                 .hasSize(expectedVideoCount);
-
-        assertThat(response.getVideosList()
-                    .stream()
+        assertThat(response.getVideosList().stream()
                     .map(SearchResultsVideoPreview::getVideoId)
-                    .map(x -> VIDEOS_BY_ID.get(UUID.fromString(x.getValue())))
-                    .collect(toList()))
-                .as("Found videos with tag %s do not match %s", tag,
-                        String.join(", ", expectedVideos))
+                    .map(x -> VideoCatalogServiceSteps.VIDEOS_BY_ID.get(UUID.fromString(x.getValue())))
+                    .collect(Collectors.toList()))
+                .as("Found videos with tag %s do not match %s", tag, String.join(", ", expectedVideos))
                 .containsAll(expectedVideos);
-                */
     }
-
+    
     @Then("^I should be suggested tags (.*) for the word (.+)$")
     public void getTagsSuggestion(List<String> expectedTags, String word) {
 
@@ -114,6 +133,23 @@ public class SearchServiceSteps extends AbstractSteps {
                 .setPageSize(100)
                 .build();
 
+        /**
+         * Search is performed using solr INDEX. As such, a delay is required for indexing.
+         * Maximum delay of 10s is OK but here we try 10 times, once per second
+         */
+        Callable<Integer> searchSuggestions = () -> {
+            System.out.println("[Waiting for solr to index tags]");
+            return searchStub.getQuerySuggestions(request).getSuggestionsList().size();
+        };
+        RetryConfig config = new RetryConfigBuilder()
+                .retryOnReturnValue(new Integer(0))
+                .failOnAnyException()
+                .withMaxNumberOfTries(10)
+                .withDelayBetweenTries(2, ChronoUnit.SECONDS)
+                .withFixedBackoff()
+                .build();
+        new CallExecutor<Integer>(config).execute(searchSuggestions);
+        
         final GetQuerySuggestionsResponse response = searchStub.getQuerySuggestions(request);
 
         assertThat(response)
@@ -122,8 +158,6 @@ public class SearchServiceSteps extends AbstractSteps {
 
         final List<String> suggestionsList = response.getSuggestionsList();
         
-        //FIXME RECOMMENDED-AS-GRAPH
-        /*
         assertThat(suggestionsList)
                 .as("Cannot find tags suggestions for word %s", word)
                 .isNotEmpty();
@@ -132,6 +166,6 @@ public class SearchServiceSteps extends AbstractSteps {
                 .as("The suggested tags %s do not match the expected tags %s",
                         String.join(", ", suggestionsList),
                         String.join(", ", expectedTags))
-                .containsExactly(expectedTags.toArray(new String[expectedTags.size()]));*/
+                .containsExactly(expectedTags.toArray(new String[expectedTags.size()]));
     }
 }

@@ -33,7 +33,7 @@ public class KillrVideoProperties {
 
         /**
          * Need to set env variable KILLRVIDEO_DOCKER_IP before launching application
-         */
+         *
         final Optional<String> dockerIp = Optional.ofNullable(System.getenv(KILLRVIDEO_DOCKER_IP));
         if (!dockerIp.isPresent()) {
 
@@ -45,6 +45,7 @@ public class KillrVideoProperties {
         } else {
             LOGGER.info("Setting docker ip to : " + dockerIp.get());
             this.dockerIp = dockerIp.get();
-        }
+        }*/
+        this.dockerIp = "10.0.75.1";
     }
 }

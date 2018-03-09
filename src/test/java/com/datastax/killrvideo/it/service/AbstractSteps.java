@@ -3,8 +3,11 @@ package com.datastax.killrvideo.it.service;
 import static java.lang.String.format;
 
 import java.util.concurrent.ExecutorService;
+
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -20,8 +23,11 @@ import io.grpc.ManagedChannel;
 @SpringBootTest
 public abstract class AbstractSteps {
 
+    /** Logger for Test.*/
+    private static Logger LOGGER = LoggerFactory.getLogger(AbstractSteps.class);
+    
     @Inject
-    ManagedChannel managedChannel;
+    protected ManagedChannel managedChannel;
 
     @Inject
     CassandraDao dao;
@@ -49,7 +55,7 @@ public abstract class AbstractSteps {
             if (!ServiceChecker.isServicePresent(etcdClient, grpcServiceUrl)) {
                 throw new PendingException(format("Please implement service %s on the KillrVideoServer",serviceName()));
             }
-
+            LOGGER.info("Testing service {} in ETCD OK", serviceName());
         } catch (Exception e) {
             throw new PendingException(format("Please implement service %s on the KillrVideoServer",serviceName()));
         }

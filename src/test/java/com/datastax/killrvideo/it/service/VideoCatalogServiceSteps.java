@@ -25,16 +25,24 @@ import killrvideo.video_catalog.VideoCatalogServiceGrpc;
 import killrvideo.video_catalog.VideoCatalogServiceGrpc.VideoCatalogServiceBlockingStub;
 import killrvideo.video_catalog.VideoCatalogServiceOuterClass.*;
 
+/**
+ * Suggestion engine.
+ * 
+ * @author DataStax evangelist team.
+ */
 public class VideoCatalogServiceSteps extends AbstractSteps {
 
+    /** Logger for the class. */
     private static Logger LOGGER = LoggerFactory.getLogger(VideoCatalogServiceSteps.class);
+    
+    /** Initialization flag. */
     private static AtomicReference<Boolean> SHOULD_CHECK_SERVICE= new AtomicReference<>(true);
 
+    /** {@inheritDoc} */
     @Override
-    protected String serviceName() {
-        return VIDEO_CATALOG_SERVICE_NAME;
-    }
+    protected String serviceName() { return VIDEO_CATALOG_SERVICE_NAME;}
 
+    @SuppressWarnings("serial")
     public static final Map<String, VideoNameById> VIDEOS = new HashMap<String, VideoNameById>() {
         {
             put("video1", new VideoNameById(UUID.randomUUID(), "b-wing-ucs.mp4"));

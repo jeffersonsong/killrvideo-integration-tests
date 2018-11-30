@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd KillrVideoIT  
+cd killrvideo-integration-tests
 /usr/bin/mvn clean compile
 /usr/bin/mvn dependency:copy-dependencies
 /usr/bin/mvn dependency:resolve-plugins

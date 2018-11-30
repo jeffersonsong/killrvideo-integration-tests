@@ -17,7 +17,7 @@ If you're running Docker4Mac (and not Docker Toolbox with VirtualBox), you need 
 
 This application is not MEANT to be run in a stand-alone mode but inside a Docker compose config. However it is still possible to run it as a separated application by following the below steps: 
 
-* First clone the project with `git clone https://github.com/doanduyhai/KillrVideoIT.git`
+* First clone the project with `git clone https://github.com/killrvideo/killrvideo-integration-tests.git`
 * Ensure that you have already run the Docker images for KillrVideo (with a `docker-compose ...`) 
 * Ensure that you have already run your own implementation of KillrVideo server
 * Execute the script _getenvirongment.sh_ to set environment variables with `. ./getenvironment.sh`
@@ -36,7 +36,7 @@ You can integrate the Docker image of this application inside a `docker-compose.
 ```yaml
 
  it_test_suite:
-    image: doanduyhai/killrvideo_it:latest
+    image: killrvideo/killrvideo-integration-tests:latest
     ports:
     # Zeppelin WEB UI port
     - 8080:8080

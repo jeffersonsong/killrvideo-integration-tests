@@ -32,7 +32,7 @@ RUN chmod -R 755 /home  \
 
 
 RUN cd /home \ 
-	&& git clone https://github.com/doanduyhai/KillrVideoIT.git 
+	&& git clone https://github.com/killrvideo/killrvideo-integration-tests.git
 
 COPY zeppelin /home/zeppelin
 ADD startup.sh /home

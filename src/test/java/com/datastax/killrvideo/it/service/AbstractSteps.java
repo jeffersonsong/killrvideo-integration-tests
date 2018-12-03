@@ -47,9 +47,7 @@ public abstract class AbstractSteps {
         final String grpcServiceUrl = "killrvideo/services/"
                 + serviceName()
                 + "/"
-                + properties.applicationName
-                + ":"
-                + properties.applicationInstanceId;
+                + properties.applicationName;
 
         try {
             if (!ServiceChecker.isServicePresent(etcdClient, grpcServiceUrl)) {

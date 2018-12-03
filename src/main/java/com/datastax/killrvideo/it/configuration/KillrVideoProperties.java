@@ -15,20 +15,17 @@ public class KillrVideoProperties {
 
 
     public static final String APPLICATION_NAME = "killrvideo.application.name";
-    public static final String APPLICATION_INSTANCE_ID = "killrvideo.application.instance.id";
     public static final String ETCD_PORT = "killrvideo.etcd.port";
     public static final String KILLRVIDEO_DOCKER_IP = "KILLRVIDEO_DOCKER_IP";
     public static final int WAIT_TIME_IN_SECONDS = 10;
 
 
     public final String applicationName;
-    public final String applicationInstanceId;
     public final int etcdPort;
     public final String dockerIp;
 
     public KillrVideoProperties(Environment env) {
         this.applicationName = env.getProperty(APPLICATION_NAME, "KillrVideo");
-        this.applicationInstanceId = env.getProperty(APPLICATION_INSTANCE_ID, "0");
         this.etcdPort = parseInt(env.getProperty(ETCD_PORT, "2379"));
 
         /**

@@ -50,12 +50,10 @@ public class KillrVideoITConfiguration {
         final String grpcUserServiceUrl = "killrvideo/services/"
                 + USER_SERVICE_NAME
                 + "/"
-                + properties.applicationName
-                + ":"
-                + properties.applicationInstanceId;
+                + properties.applicationName;
 
         while (!ServiceChecker.isServicePresent(etcdClient, grpcUserServiceUrl)) {
-            System.out.println("Waiting 10 seconds for KillrVideoServer services to be registered");
+            System.out.println("Waiting 10 seconds for KillrVideoServer services to be registered: " + grpcUserServiceUrl);
             Thread.sleep(10000);
         }
 

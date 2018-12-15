@@ -150,7 +150,7 @@ public class VideoCatalogServiceSteps extends AbstractSteps {
 
         assertThat(response.getVideoPreviewsList().stream().map(VideoPreview::getName).collect(toList()))
                 .as("Cannot get previews for %s", String.join(", ", expectedVideos))
-                .containsExactly(expectedVideos.stream().map(x -> VIDEOS.get(x).name).collect(toList()).toArray(new String[expectedVideoCount]));
+                .contains(expectedVideos.stream().map(x -> VIDEOS.get(x).name).collect(toList()).toArray(new String[expectedVideoCount]));
     }
 
     @Then("latest videos preview contains: (.*)")

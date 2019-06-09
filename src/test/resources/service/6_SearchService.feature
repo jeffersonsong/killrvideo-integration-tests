@@ -25,4 +25,5 @@ Feature: Video Search Management
       | video2 | 2017-police-station.mp4   | Lego 2017 Police Staton            | lego,police          | https://www.youtube.com/watch?v=fpKyfwnkKko |
       | video3 | every-breath-you-take.mp4 | The Police - Every breath you take | police,pop,eighties  | https://www.youtube.com/watch?v=OMOGaugKpzs |
       | video4 | yesterday.mp4             | The Beattles - Yesterday           | pop,beattles,top     | https://www.youtube.com/watch?v=Ho2e0zvGEWE |
-    Then I should be suggested tags police,pop for the word po
+      | video5 | your-stuff.mp4            | Up to the time of upon             | pop                  | https://www.youtube.com/watch?v=vKkUMZ2u5GQ |
+    Then I should be suggested tags upon for the word up

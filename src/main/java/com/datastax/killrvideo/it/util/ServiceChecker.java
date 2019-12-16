@@ -10,14 +10,20 @@ import java.net.*;
 
 public class ServiceChecker {
 
+    public static final int WAIT_TIMEOUT = 1200;
+
     public static void waitForService(String service, String address, int port, int waitTimeInSec) throws Exception {
 
         System.out.println(format("Attempting to connect to service %s on %s:%s", service, address, port));
 
+        long startTime = System.currentTimeMillis();
         while (true) {
             if (isServiceAccessible(service, address, port)) {
                 return;
             } else {
+                if (System.currentTimeMillis() - startTime >= WAIT_TIMEOUT * 1000) {
+                    throw new RuntimeException(format("Timeout reached while waiting for the %s service.", service));
+                }
                 System.out.println(format("Waiting %s secs for %s to start", waitTimeInSec, service));
                 Thread.sleep(waitTimeInSec * 1000);
             }

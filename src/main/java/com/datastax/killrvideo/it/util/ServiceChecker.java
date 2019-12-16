@@ -10,7 +10,7 @@ import java.net.*;
 
 public class ServiceChecker {
 
-    public static final int WAIT_TIMEOUT = 1200;
+    public static final int WAIT_TIMEOUT = 600;
 
     public static void waitForService(String service, String address, int port, int waitTimeInSec) throws Exception {
 

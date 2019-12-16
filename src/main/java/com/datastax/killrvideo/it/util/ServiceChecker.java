@@ -2,10 +2,11 @@ package com.datastax.killrvideo.it.util;
 
 import static java.lang.String.format;
 
+import com.datastax.killrvideo.it.configuration.KillrVideoProperties;
+
+import java.util.HashMap;
 import java.io.IOException;
 import java.net.*;
-
-import com.xqbase.etcd4j.EtcdClient;
 
 public class ServiceChecker {
 
@@ -23,18 +24,26 @@ public class ServiceChecker {
         }
     }
 
-    public static boolean isServicePresent(EtcdClient etcdClient, String grpcServiceName) throws Exception {
-        final String hostAndPort = etcdClient.get(grpcServiceName);
-        if (hostAndPort != null) {
-            HostAndPortSplitter.ensureValidFormat(hostAndPort,
-                    format("The %s is not a valid host:port format", hostAndPort));
-
-            final String address = HostAndPortSplitter.extractAddress(hostAndPort);
-            final int port = HostAndPortSplitter.extractPort(hostAndPort);
-            return isServiceAccessible(grpcServiceName, address, port);
-        } else {
+    public static boolean isServicePresent(HashMap<String, String> services, String grpcServiceName) throws Exception {
+        if (!services.containsKey(grpcServiceName)) {
             return false;
         }
+
+        final String address = services.get(grpcServiceName);
+
+        HostAndPortSplitter.ensureValidFormat(
+            address,
+            format("The %s is not a valid host:port format", address)
+        );
+
+        final String host = HostAndPortSplitter.extractAddress(address);
+        final int port = HostAndPortSplitter.extractPort(address);
+
+        return isServiceAccessible(
+            grpcServiceName, 
+            host, 
+            port
+        );
     }
 
     private static boolean isServiceAccessible(String service, String address, int port) throws Exception {

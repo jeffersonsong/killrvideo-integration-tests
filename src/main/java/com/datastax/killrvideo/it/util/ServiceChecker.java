@@ -24,7 +24,7 @@ public class ServiceChecker {
                 if (System.currentTimeMillis() - startTime >= WAIT_TIMEOUT * 1000) {
                     throw new RuntimeException(format("Timeout reached while waiting for the %s service.", service));
                 }
-                System.out.println(format("Waiting %s secs for %s to start", waitTimeInSec, service));
+                System.out.println(format("Waiting %s secs for %s to start, %s seconds left till timeout", waitTimeInSec, service, (System.currentTimeMillis() - startTime) / 1000));
                 Thread.sleep(waitTimeInSec * 1000);
             }
         }

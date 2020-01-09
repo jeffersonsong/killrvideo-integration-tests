@@ -5,6 +5,6 @@ WORKDIR /root
 COPY pom.xml /root/
 COPY src/ /root/src
 
-RUN mvn clean compile dependency:copy-dependencies dependency:resolve-plugins
+RUN mvn process-test-resources test-compile compile dependency:copy-dependencies dependency:resolve-plugins
 
-CMD ["mvn", "test"]
+CMD ["mvn", "surefire:test"]

@@ -21,12 +21,12 @@ public class KillrVideoProperties {
 
 
     public final String applicationName;
-    public final int etcdPort;
+    //public final int etcdPort;
     public final String dockerIp;
 
     public KillrVideoProperties(Environment env) {
         this.applicationName = env.getProperty(APPLICATION_NAME, "KillrVideo");
-        this.etcdPort = parseInt(env.getProperty(ETCD_PORT, "2379"));
+        //this.etcdPort = parseInt(env.getProperty(ETCD_PORT, "2379"));
 
         /**
          * Need to set env variable KILLRVIDEO_DOCKER_IP before launching application
@@ -43,6 +43,6 @@ public class KillrVideoProperties {
             LOGGER.info("Setting docker ip to : " + dockerIp.get());
             this.dockerIp = dockerIp.get();
         }*/
-        this.dockerIp = "10.0.75.1";
+        this.dockerIp = "1172.17.0.1";
     }
 }

@@ -9,6 +9,6 @@ import cucumber.api.junit.Cucumber;
 @CucumberOptions(
         strict=false,
         plugin = {"progress", "html:/tmp/cucumber-report"},
-        features = "src/test/resources")
+        features = "src/test/resources/service")
 public class ServicesTest {
 }

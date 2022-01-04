@@ -1,0 +1,10 @@
+killrvideo:
+  application:
+    name: killrvideo
+  service:
+    host: 127.0.0.1
+    port: 50101
+
+cassandra:
+  host: 127.0.0.1
+  port: 9042

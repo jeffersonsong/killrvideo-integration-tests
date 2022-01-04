@@ -15,22 +15,19 @@ public class KillrVideoProperties {
 
 
     public static final String APPLICATION_NAME = "killrvideo.application.name";
-    public static final String ETCD_PORT = "killrvideo.etcd.port";
     public static final String KILLRVIDEO_DOCKER_IP = "KILLRVIDEO_DOCKER_IP";
     public static final int WAIT_TIME_IN_SECONDS = 10;
 
 
     public final String applicationName;
-    //public final int etcdPort;
     public final String dockerIp;
 
     public KillrVideoProperties(Environment env) {
         this.applicationName = env.getProperty(APPLICATION_NAME, "KillrVideo");
-        //this.etcdPort = parseInt(env.getProperty(ETCD_PORT, "2379"));
 
         /**
          * Need to set env variable KILLRVIDEO_DOCKER_IP before launching application
-         *
+         */
         final Optional<String> dockerIp = Optional.ofNullable(System.getenv(KILLRVIDEO_DOCKER_IP));
         if (!dockerIp.isPresent()) {
 
@@ -42,7 +39,6 @@ public class KillrVideoProperties {
         } else {
             LOGGER.info("Setting docker ip to : " + dockerIp.get());
             this.dockerIp = dockerIp.get();
-        }*/
-        this.dockerIp = "1172.17.0.1";
+        }
     }
 }

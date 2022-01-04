@@ -30,9 +30,6 @@ public abstract class AbstractSteps {
     @Inject
     ExecutorService threadPool;
 
-    @Inject
-    KillrVideoProperties properties;
-
     protected abstract String serviceName();
 
     protected void checkForService() {

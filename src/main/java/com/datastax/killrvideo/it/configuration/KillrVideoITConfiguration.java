@@ -1,7 +1,6 @@
 package com.datastax.killrvideo.it.configuration;
 
 import com.datastax.killrvideo.it.async.KillrVideoThreadFactory;
-import com.datastax.killrvideo.it.util.HostAndPortSplitter;
 import com.datastax.killrvideo.it.util.ServiceChecker;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -9,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -16,7 +16,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.datastax.killrvideo.it.configuration.KillrVideoProperties.WAIT_TIME_IN_SECONDS;
-import static java.lang.String.format;
 
 
 @Configuration
@@ -33,13 +32,9 @@ public class KillrVideoITConfiguration {
     public static final String SUGGESTED_VIDEOS_SERVICE_NAME = "SuggestedVideoService";
 
     @Bean
-    public ManagedChannel getManagedChannel() throws Exception {
-        final String hostAndPort = "127.0.0.1:50101";
-        HostAndPortSplitter.ensureValidFormat(hostAndPort,
-                format("The %s is not a valid host:port format", hostAndPort));
-
-        final String address = HostAndPortSplitter.extractAddress(hostAndPort);
-        final int port = HostAndPortSplitter.extractPort(hostAndPort);
+    public ManagedChannel getManagedChannel(Environment env) throws Exception {
+        final String address = env.getProperty("killrvideo.service.host");
+        final int port = Integer.parseInt(env.getProperty("killrvideo.service.port"));
 
         ServiceChecker.waitForService("KillrVideoServer " + USER_SERVICE_NAME, address, port, WAIT_TIME_IN_SECONDS);
 
